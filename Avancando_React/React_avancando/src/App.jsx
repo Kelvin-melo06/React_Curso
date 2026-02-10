@@ -5,6 +5,7 @@ import State from './Components/state.jsx'
 import ListRender from './Components/ListRender.jsx'
 import ShowUserDetails from './Components/ShowUserDetails.jsx'
 import Button from './Components/Button.jsx'
+import Button2 from './Components/Button2.jsx'
 
 function App() {
   
@@ -32,6 +33,8 @@ function App() {
       variant="danger"
       onClick={()=>{console.log("Excluiu")}}
       />
+
+      <Button2 text="Enviar" />
       
     </div>
   )
