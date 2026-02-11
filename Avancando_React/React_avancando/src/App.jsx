@@ -6,6 +6,15 @@ import ListRender from './Components/ListRender.jsx'
 import ShowUserDetails from './Components/ShowUserDetails.jsx'
 import Button from './Components/Button.jsx'
 import Button2 from './Components/Button2.jsx'
+import CarDetails from './Components/CarDetails.jsx'
+
+
+const car = [
+  {id: 1, brand: "Ford", color: "Preto", year: 2020, km: 0},
+  {id: 2, brand: "Chevrolet", color: "Branco", year: 2021, km: 2000},
+  {id: 3, brand: "Dodge", color: "Vermelho", year: 2019, km: 5000}
+]
+
 
 function App() {
   
@@ -35,7 +44,17 @@ function App() {
       />
 
       <Button2 text="Enviar" />
-      
+
+      {car.map((car) => (
+        <CarDetails
+          key={car.id}
+          brand={car.brand}
+          model={car.color}
+          year={car.year}
+          km={car.km}
+        />
+      ))}
+
     </div>
   )
 }
