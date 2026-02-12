@@ -6,7 +6,7 @@ const TaskItem = ({text, done, onToggle, onRemove}) => {
         <span 
             onClick={onToggle}
             className='text-span'
-            style={{textDecoration: done ? 'line-through' : 'none', cursor:"pointer"} }
+            style={done ? {textDecoration: 'line-through'} : {}}
             >
             {text}
         </span>
