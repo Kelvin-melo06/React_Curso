@@ -7,6 +7,10 @@ import ShowUserDetails from './Components/ShowUserDetails.jsx'
 import Button from './Components/Button.jsx'
 import Button2 from './Components/Button2.jsx'
 import CarDetails from './Components/CarDetails.jsx'
+import Children from './Components/Children.jsx'
+import Message from './Components/Message.jsx'
+import { useState } from 'react'
+import ChangeMessage from './Components/ChangeMessage.jsx'
 
 
 const car = [
@@ -17,6 +21,11 @@ const car = [
 
 
 function App() {
+  const [message, setMessage] = useState("");
+
+  const handleMessage = (msg) =>{
+    setMessage(msg);
+  }
   
   return (
     <div className='App' style={{paddingBottom: "500px"}}>
@@ -54,6 +63,15 @@ function App() {
           km={car.km}
         />
       ))}
+
+      <Children>
+        <p>Este é o conteúdo passado como children para o componente Children.</p>
+      </Children>
+
+      <Message msg={message} />
+      <ChangeMessage handleMessage={handleMessage} />
+
+
 
     </div>
   )

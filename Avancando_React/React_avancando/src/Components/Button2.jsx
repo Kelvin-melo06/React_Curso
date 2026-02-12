@@ -13,7 +13,7 @@ const Button2 = ({text}) => {
   return (
     <div>
         <button onClick={handleClick}>
-            {loading ? "Carregando..." : {text}}
+            {loading ? "Carregando..." : text}
         </button>
     </div>
   )
