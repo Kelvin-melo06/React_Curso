@@ -41,7 +41,7 @@ const MyImcForm = () => {
                 />
             </div>
             <div className="input-group">
-                <label 
+                <label className="segundLabel" 
                     htmlFor="peso"
                 >
                     Peso(kg)
@@ -57,12 +57,18 @@ const MyImcForm = () => {
                 />
             </div>
 
-            <button type="button" onClick={ImcCalcule}>Calcular</button>
+            <div className="container-button">
+                <button 
+                    type="button"
+                    onClick={ImcCalcule}>
+                        Calcular
+                </button>
+            </div>
 
             <div className="result">
                 <h2>Resultados</h2>
                 <p>Seu IMC é: {imc}</p>
-                {imc && <ClassifyImc imcUser = {imc} />}
+                {imc && <ClassifyImc key={imc} imcUser = {imc} />}
             </div>
         </div>
     </div>
