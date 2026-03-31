@@ -1,29 +1,4 @@
 {
-  "products": [
-    {
-      "id": "1",
-      "name": "capa de chuva",
-      "price": "10.99"
-    },
-    {
-      "id": "2",
-      "name": "teclado",
-      "price": "19.99"
-    },
-    {
-      "id": "3",
-      "name": "cadeira",
-      "price": "200"
-    },
-    {
-      "name": "mouse",
-      "price": "200",
-      "id": "r95cr6vPcF0"
-    },
-    {
-      "name": "Monitor",
-      "price": 300.5,
-      "id": "fefDHe47lyg"
-    }
-  ]
+  "products": [],
+  "$schema": "./node_modules/json-server/schema.json"
 }

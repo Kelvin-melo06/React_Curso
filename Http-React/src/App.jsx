@@ -1,11 +1,10 @@
-import "./App.css";
 import { useState, useEffect } from "react";
-import { useFetch } from "../hooks/useFetch.jsx";
+import { useFetch } from "./hooks/useFetch.jsx";
 
 const url = "http://localhost:3000/products";
 
 function App() {
-  const { data: items, loading, postData } = useFetch(url);
+  const { data: items, loading, error, httpConfig } = useFetch(url);
 
   useEffect(() => {
     console.log(items);
@@ -22,21 +21,25 @@ function App() {
       price: Number(price),
     };
 
-    postData(product);
+    httpConfig(product, "POST");
   };
 
   return (
     <div className="flex flex-col items-center gap-4">
       <h1 className="text-3xl font-bold">Http-React</h1>
-      {loading ? (
-        <p>Loading...</p>
-      ) : (
+      {loading && <p>Carregando Dados...</p>}
+      {error && <p>{error}</p>}
+      {!error && (
         <ul>
-          {items.map((product) => (
-            <li key={product.id}>
-              {product.name} - R$ {product.price}
-            </li>
-          ))}
+          {items &&
+            items.map((product) =>(
+              <li key={product.id}>
+                {product.name} - R$ {product.price}
+                <button onClick={() => httpConfig(null, "DELETE", product.id)} className="ml-4 bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition duration-200">
+                  Deletar
+                </button>
+              </li>
+            ))}
         </ul>
       )}
 
@@ -63,11 +66,20 @@ function App() {
               onChange={(e) => setPrice(e.target.value)}
             />
           </label>
-          <input
-            type="submit"
-            className="border border-gray-300 rounded-md shadow-sm p-2 bg-blue-500 text-white w-48 hover:bg-blue-600 hover:transform hover:scale-105 hover:transition duration-200 hover: transition-all"
-            value="Enviar"
-          />
+          {loading ? (
+            <input
+              className="border border-gray-300 rounded-md shadow-sm p-2 bg-blue-500 text-white w-48 hover:bg-blue-600 hover:transform hover:scale-105 hover:transition duration-200 hover: transition-all"
+              type="submit"
+              disabled
+              value="Aguarde"
+            />
+          ) : (
+            <input
+              type="submit"
+              className="border border-gray-300 rounded-md shadow-sm p-2 bg-blue-500 text-white w-48 hover:bg-blue-600 hover:transform hover:scale-105 hover:transition duration-200 hover: transition-all"
+              value="Enviar"
+            />
+          )}
         </form>
       </div>
     </div>
