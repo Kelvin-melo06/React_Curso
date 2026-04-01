@@ -1,33 +1,33 @@
 import { useState, useEffect } from "react";
 
-// 4 - custom hook
 export const useFetch = (url) => {
-  const [data, setData] = useState(null);
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  // 5 - refatorando post
   const [config, setConfig] = useState(null);
   const [method, setMethod] = useState(null);
-  const [callFetch, setCallFetch] = useState(false);
-
-  // 6 - loading
-  const [loading, setLoading] = useState(false);
-
-  // 7 - tratando erros
-  const [error, setError] = useState(null);
 
   const [id, setId] = useState(null);
 
+  const bodyRequest = (method, data, id) => {
+    setConfig({
+      method,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    setMethod(method);
+    id !== undefined && setId(id);
+  };
+
   const httpConfig = (data, method, id) => {
     if (method === "POST") {
-      setConfig({
-        method,
-        headers: {
-          "Content-type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-
-      setMethod(method);
+      bodyRequest(method, data);
+    } else if (method === "PATCH") {
+      bodyRequest(method, data, id);
     } else if (method === "DELETE") {
       setMethod(method);
       setId(id);
@@ -35,47 +35,76 @@ export const useFetch = (url) => {
   };
 
   useEffect(() => {
-    // 6 - loading
-    setLoading(true);
+    if (!method) return;
+    setLoading(true); 
 
-    const fetchData = async () => {
-      // 7 - tratando erros
+    async function httpRequest() {
+      setError(null);
       try {
-        const res = await fetch(url);
-
-        const json = await res.json();
-
-        setData(json);
+        if (method === "POST") {
+          const res = await fetch(url, config);
+          if (!res.ok) {
+            throw new Error("Erro ao enviar dados");
+          }
+          const json = await res.json();
+          setData((prevData) => [...prevData, json]);
+        } else if (method === "PATCH") {
+          const res = await fetch(`${url}/${id}`, config);
+          if (!res.ok) {
+            throw new Error("Erro ao atualizar dados");
+          }
+          const json = await res.json();
+          setData((prevData) => {
+            return prevData.map((item) => (item.id === id ? json : item));
+          });
+        } else if (method === "DELETE") {
+          const res = await fetch(`${url}/${id}`, { method: "DELETE" });
+          if (!res.ok) {
+            throw new Error("Erro ao deletar dados");
+          }
+          setData((prevData) => prevData.filter((item) => item.id !== id));
+        }
       } catch (error) {
         console.log(error.message);
-
-        setError("Houve algum erro ao carregar os dados!");
+        setError("Erro na requisição");
+      } finally {
+        setLoading(false);
       }
-
-      // 6 - loading
-      setLoading(false);
-    };
-
-    fetchData();
-  }, [url, callFetch]);
-
-  // 5 - refatorando post
-  useEffect(() => {
-    const httpRequest = async () => {
-      if (method === "POST") {
-        let fetchOptions = [url, config];
-
-        await fetch(...fetchOptions);
-      } else if (method === "DELETE") {
-        let deleteUrl = `${url}/${id}`;
-        await fetch(deleteUrl, { method: "DELETE" });
-      }
-
-      setCallFetch((prev) => !prev);
-    };
+    }
+    setMethod(null); 
 
     httpRequest();
   }, [config, method, url, id]);
 
-  return { data, httpConfig, loading, error };
+  // GET
+  useEffect(() => {
+    setLoading(true);
+
+    async function fetchData() {
+      try {
+        const res = await fetch(url);
+        if (!res.ok) {
+          throw new Error("Erro ao buscar dados");
+        }
+
+        const json = await res.json();
+
+        const normalizedData = json.map((item) => ({
+          ...item,
+          price: Number(item.price),
+        }));
+
+        setData(normalizedData);
+      } catch (error) {
+        console.log(error.message);
+        setError("Erro ao carregar dados");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchData();
+  }, [url]);
+
+  return { data, loading, error, httpConfig };
 };

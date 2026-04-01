@@ -1,17 +1,14 @@
-import { useState, useEffect } from "react";
 import { useFetch } from "./hooks/useFetch.jsx";
+import { useState } from "react";
 
 const url = "http://localhost:3000/products";
 
 function App() {
   const { data: items, loading, error, httpConfig } = useFetch(url);
 
-  useEffect(() => {
-    console.log(items);
-  }, [items]);
-
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
+  const [isEditId, setIsEditId] = useState(null);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -22,64 +19,83 @@ function App() {
     };
 
     httpConfig(product, "POST");
+
+    setName("");
+    setPrice("");
+  };
+
+  const handleEdit = (product) => {
+    setIsEditId(product.id);
+    setName(product.name);
+    setPrice(product.price);
+  };
+
+  const handleSave = (id) => {
+    httpConfig({ name, price: Number(price) }, "PATCH", id);
+
+    // ✅ limpa edição
+    setIsEditId(null);
+    setName("");
+    setPrice("");
   };
 
   return (
-    <div className="flex flex-col items-center gap-4">
-      <h1 className="text-3xl font-bold">Http-React</h1>
-      {loading && <p>Carregando Dados...</p>}
+    <div className="App">
+      <h1>Lista de Produtos</h1>
+
+      {loading && <p>Carregando Dados....</p>}
       {error && <p>{error}</p>}
-      {!error && (
+
+      {items && items.length > 0 ? ( // ✅ mais seguro
         <ul>
-          {items &&
-            items.map((product) =>(
-              <li key={product.id}>
-                {product.name} - R$ {product.price}
-                <button onClick={() => httpConfig(null, "DELETE", product.id)} className="ml-4 bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition duration-200">
-                  Deletar
+          {items.map((product) => (
+            <li key={product.id}>
+              {product.name} - R${product.price.toFixed(2)}
+
+              <button onClick={() => handleEdit(product)}>
+                Editar
+              </button>
+
+              <button onClick={() => httpConfig(null, "DELETE", product.id)}>
+                Excluir
+              </button>
+
+              {isEditId === product.id && (
+                <button onClick={() => handleSave(product.id)}>
+                  Salvar
                 </button>
-              </li>
-            ))}
+              )}
+            </li>
+          ))}
         </ul>
+      ) : (
+        <p>Nenhum produto encontrado.</p>
       )}
 
       <div>
-        <form
-          onSubmit={handleSubmit}
-          className="flex flex-col justify-center items-center gap-4"
-        >
-          <label className="block">
+        <form onSubmit={handleSubmit}>
+          <label>
             <span>Name:</span>
             <input
-              className="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 p-2 w-full h-7 ml-2"
               type="text"
+              required
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
           </label>
+
           <label>
             <span>Price:</span>
             <input
-              className="border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 p-2 w-full h-7 ml-2"
               type="number"
+              step="0.01"
+              required
               value={price}
               onChange={(e) => setPrice(e.target.value)}
             />
           </label>
-          {loading ? (
-            <input
-              className="border border-gray-300 rounded-md shadow-sm p-2 bg-blue-500 text-white w-48 hover:bg-blue-600 hover:transform hover:scale-105 hover:transition duration-200 hover: transition-all"
-              type="submit"
-              disabled
-              value="Aguarde"
-            />
-          ) : (
-            <input
-              type="submit"
-              className="border border-gray-300 rounded-md shadow-sm p-2 bg-blue-500 text-white w-48 hover:bg-blue-600 hover:transform hover:scale-105 hover:transition duration-200 hover: transition-all"
-              value="Enviar"
-            />
-          )}
+
+          <button type="submit">Adicionar</button>
         </form>
       </div>
     </div>
